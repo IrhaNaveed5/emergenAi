@@ -6,13 +6,21 @@ from fastapi.responses import JSONResponse
 
 from .api.patients.endpoints import router as patients_router
 from .config import settings
+from .database import init_db
 from .logger import setup_logging, get_logger
+from .middleware.rate_limiter import RateLimiterMiddleware
 
 setup_logging()
 logger = get_logger(__name__)
 
 
-app = FastAPI()
+app = FastAPI(title=settings.PROJECT_NAME, version="0.1.0", debug=settings.DEBUG)
+
+
+@app.on_event("startup")
+def startup():
+    # init_db()
+    logger.info("Database initialized")
 
 app.add_middleware(
     CORSMiddleware,
@@ -21,6 +29,7 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+app.add_middleware(RateLimiterMiddleware)
 
 
 @app.middleware("http")

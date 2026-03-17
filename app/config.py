@@ -14,7 +14,7 @@ class Settings(BaseSettings):
     SECRET_KEY: str = "change-this-in-production"
 
     # Database
-    DATABASE_URL: str = "postgresql+asyncpg://username:password@localhost:5432/iCare"
+    DATABASE_URL: str = "postgresql://username:password@localhost:5432/iCare"
 
     # CORS
     ALLOWED_ORIGINS: list[str] = ["*"]

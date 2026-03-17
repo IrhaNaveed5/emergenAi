@@ -1,18 +1,18 @@
-from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, async_sessionmaker
-from sqlalchemy.orm import DeclarativeBase
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker, DeclarativeBase, Session
 
 from .config import settings
 
-engine = create_async_engine(
+engine = create_engine(
     settings.DATABASE_URL,
     echo=settings.DEBUG,
     pool_pre_ping=True,
 )
 
-AsyncSessionLocal = async_sessionmaker(
+SessionLocal = sessionmaker(
     bind=engine,
-    class_=AsyncSession,
-    expire_on_commit=False,
+    autocommit=False,
+    autoflush=False,
 )
 
 
@@ -20,18 +20,19 @@ class Base(DeclarativeBase):
     pass
 
 
-async def get_db() -> AsyncSession:
+def get_db() -> Session:
     """FastAPI dependency that yields a database session."""
-    async with AsyncSessionLocal() as session:
-        try:
-            yield session
-            await session.commit()
-        except Exception:
-            await session.rollback()
-            raise
+    db = SessionLocal()
+    try:
+        yield db
+        db.commit()
+    except Exception:
+        db.rollback()
+        raise
+    finally:
+        db.close()
 
 
-async def init_db() -> None:
+def init_db() -> None:
     """Create all tables on startup (use Alembic for production migrations)."""
-    async with engine.begin() as conn:
-        await conn.run_sync(Base.metadata.create_all)
+    Base.metadata.create_all(bind=engine)
