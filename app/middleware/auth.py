@@ -12,36 +12,12 @@ from ..logger import get_logger
 
 logger = get_logger(__name__)
 
-# ---------------------------------------------------------------------------
-# JWKS cache — fetched once, refreshed every 12 hours
-# ---------------------------------------------------------------------------
-_jwks_cache: dict = {}
-_jwks_fetched_at: float = 0
-_JWKS_TTL = 43200  # 12 hours in seconds
-
 # Paths that skip auth entirely
 PUBLIC_PATHS = {"/", "/docs", "/openapi.json", "/redoc"}
 
 
 def _is_public(path: str) -> bool:
     return path in PUBLIC_PATHS or path.startswith("/api/v1/health")
-
-
-async def _get_jwks() -> dict:
-    """Fetch JWKS from iCM and cache it."""
-    global _jwks_cache, _jwks_fetched_at
-
-    if _jwks_cache and (time.time() - _jwks_fetched_at) < _JWKS_TTL:
-        return _jwks_cache
-
-    async with httpx.AsyncClient() as client:
-        response = await client.get(settings.ICM_JWKS_URL, timeout=10)
-        response.raise_for_status()
-        _jwks_cache = response.json()
-        _jwks_fetched_at = time.time()
-        logger.info("JWKS refreshed from iCM")
-
-    return _jwks_cache
 
 
 async def _validate_via_endpoint(token: str) -> dict:
