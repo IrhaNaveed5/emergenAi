@@ -13,6 +13,11 @@ class Settings(BaseSettings):
     # Security
     SECRET_KEY: str = "change-this-in-production"
 
+    # iCM Auth
+    ICM_PUBLIC_KEY: str = ""        # static public key provided by iCM (PEM format)
+    ICM_AUTH_ENDPOINT: str = ""     # or validate token by calling iCM endpoint (fallback)
+    JWT_ALGORITHM: str = "RS256"
+
     # Database
     DATABASE_URL: str = "postgresql://username:password@localhost:5432/iCare"
 

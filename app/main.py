@@ -8,6 +8,7 @@ from .api.patients.endpoints import router as patients_router
 from .config import settings
 from .database import init_db
 from .logger import setup_logging, get_logger
+from .middleware.auth import AuthMiddleware
 from .middleware.rate_limiter import RateLimiterMiddleware
 
 setup_logging()
@@ -30,6 +31,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 app.add_middleware(RateLimiterMiddleware)
+app.add_middleware(AuthMiddleware)
 
 
 @app.middleware("http")
