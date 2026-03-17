@@ -1,0 +1,21 @@
+[tool.poetry]
+name = "icare"
+version = "0.1.0"
+description = "FastAPI application"
+authors = ["IrhaNaveed5 <irha.naveed@camp1.tkxel.com>"]
+packages = [{include = "app"}]
+
+[tool.poetry.dependencies]
+python = "^3.10"
+fastapi = "^0.135.1"
+uvicorn = {extras = ["standard"], version = "^0.42.0"}
+pydantic-settings = "^2.7.0"
+sqlalchemy = {extras = ["asyncio"], version = "^2.0.0"}
+asyncpg = "^0.30.0"
+alembic = "^1.14.0"
+redis = "^7.3.0"
+
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
